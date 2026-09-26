@@ -1,0 +1,11 @@
+# Local Netlify folder
+.netlify
+
+node_modules
+.env
+
+roadmap-comando-avance.md
+roadmap-comando-steam-streamelements.md
+
+# Deno lockfile generado por Netlify
+deno.lock
