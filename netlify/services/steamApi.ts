@@ -3,7 +3,6 @@ import type {
   PlayerAchievementsResponse,
   PlayerSummariesResponse,
   PlayerSummary,
-  RecentlyPlayedResponse,
   SteamGame,
 } from "../types/steam";
 
@@ -85,13 +84,6 @@ export const getOwnedGames = async (): Promise<SteamGame[]> => {
     throw new SteamApiError("private", "GetOwnedGames vino vacío: detalles de juego privados");
   }
   return games;
-};
-
-export const getRecentlyPlayedGames = async (): Promise<SteamGame[]> => {
-  const { body } = await steamFetch<RecentlyPlayedResponse>("/IPlayerService/GetRecentlyPlayedGames/v1/", {
-    steamid: getSteamId(),
-  });
-  return body?.response.games ?? [];
 };
 
 export const getAchievementProgress = async (appid: number): Promise<{ achieved: number; total: number } | null> => {

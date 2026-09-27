@@ -30,13 +30,6 @@ export interface PlayerSummariesResponse {
   };
 }
 
-export interface RecentlyPlayedResponse {
-  response: {
-    total_count?: number;
-    games?: SteamGame[];
-  };
-}
-
 export interface PlayerAchievementsResponse {
   playerstats: {
     success: boolean;

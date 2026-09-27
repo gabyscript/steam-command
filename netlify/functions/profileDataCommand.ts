@@ -1,7 +1,8 @@
 import type { Config } from "@netlify/functions";
+import { steamErrorMessage, textResponse } from "../services/chatResponse";
 import { countCompleted, readCompletion } from "../services/completionStore";
-import { getGameLibrary } from "../services/gameLibrary";
-import { getPlayerSummary, getRecentlyPlayedGames, SteamApiError } from "../services/steamApi";
+import { getGameLibrary, getLastPlayedGame } from "../services/gameLibrary";
+import { getPlayerSummary } from "../services/steamApi";
 import type { SteamGame } from "../types/steam";
 
 // Margen bajo el límite de 500 caracteres del chat de Twitch.
@@ -14,39 +15,21 @@ const getProfileUrlFallback = () => {
   return steamId ? `https://steamcommunity.com/profiles/${steamId}/` : null;
 };
 
-const textResponse =(message: string) =>
-  new Response(message, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
-
 const formatHours = (minutes: number) => Math.round(minutes / 60).toLocaleString("es-CL");
-
-const errorMessage = (error: unknown): string => {
-  if (error instanceof SteamApiError) {
-    switch (error.kind) {
-      case "private":
-        return "El perfil de Steam es privado 🔒";
-      case "config":
-        return "El comando !steam está mal configurado 🛠️";
-      default:
-        return "Steam no responde, intenta en un rato ⏳";
-    }
-  }
-  return "No pude obtener las stats de Steam, intenta en un rato ⏳";
-};
 
 const mostPlayed = (games: SteamGame[]) =>
   games.reduce((top, game) => (game.playtime_forever > top.playtime_forever ? game : top));
 
 export default async () => {
-  const [summaryResult, libraryResult, recentResult, completionResult] = await Promise.allSettled([
+  const [summaryResult, libraryResult, completionResult] = await Promise.allSettled([
     getPlayerSummary(),
     getGameLibrary(),
-    getRecentlyPlayedGames(),
     readCompletion(),
   ]);
 
   if (libraryResult.status === "rejected") {
     console.error("profileDataCommand: error obteniendo la biblioteca:", libraryResult.reason);
-    return textResponse(errorMessage(libraryResult.reason));
+    return textResponse(steamErrorMessage(libraryResult.reason, "!steam"));
   }
 
   const games = libraryResult.value;
@@ -67,10 +50,11 @@ export default async () => {
   const top = mostPlayed(games);
   parts.push(`Más jugado: ${top.name ?? top.appid} (${formatHours(top.playtime_forever)} h)`);
 
+  const recent = getLastPlayedGame(games);
   if (summary?.gameextrainfo) {
     parts.push(`Jugando ahora: ${summary.gameextrainfo}`);
-  } else if (recentResult.status === "fulfilled" && recentResult.value[0]) {
-    parts.push(`Reciente: ${recentResult.value[0].name ?? recentResult.value[0].appid}`);
+  } else if (recent) {
+    parts.push(`Reciente: ${recent.name ?? recent.appid}`);
   }
 
   const profileUrl = summary?.profileurl ?? getProfileUrlFallback();
