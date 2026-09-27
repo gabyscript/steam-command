@@ -28,7 +28,7 @@ const resolveCurrentGame = async (): Promise<Resolution> => {
   if (libraryResult.status === "rejected") throw libraryResult.reason;
 
   const recent = getLastPlayedGame(library);
-  return recent ? { game: recent } : { message: "No encontré un juego reciente, usa !avance {juego}" };
+  return recent ? { game: recent } : { message: "No encontré un juego reciente, usa !progress {juego}" };
 };
 
 const resolveByAppid = async (appid: number): Promise<Resolution> => {
@@ -43,7 +43,7 @@ const resolveByName = async (query: string): Promise<Resolution> => {
       return { game: result.game };
     case "ambiguous": {
       const options = result.candidates.map(game => `${gameName(game)} (${game.appid})`).join(", ");
-      return { message: `¿Quisiste decir: ${options}? Usa !avance {id}` };
+      return { message: `¿Quisiste decir: ${options}? Usa !progress {id}` };
     }
     default:
       return { message: "No encontré ese juego, prueba con su ID" };
@@ -83,7 +83,7 @@ export default async (req: Request) => {
     return textResponse(await progressMessage(resolution.game));
   } catch (error) {
     console.error(`gameProgressCommand: error con la consulta "${query}":`, error);
-    return textResponse(steamErrorMessage(error, "!avance"));
+    return textResponse(steamErrorMessage(error, "!progress"));
   }
 };
 

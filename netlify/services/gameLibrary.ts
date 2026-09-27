@@ -10,7 +10,7 @@ interface CachedLibrary {
   games: SteamGame[];
 }
 
-// Usado por !steam ("Reciente") y !avance (sin argumento) para que coincidan.
+// Usado por !steam ("Reciente") y !progress (sin argumento) para que coincidan.
 // Los programas fuera de GetOwnedGames (p. ej. RetroArch) no tienen rtime_last_played.
 export const getLastPlayedGame = (games: SteamGame[]): SteamGame | undefined =>
   games.reduce<SteamGame | undefined>(

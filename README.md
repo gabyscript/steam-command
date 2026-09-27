@@ -47,9 +47,9 @@ El cálculo es **incremental**: solo vuelve a consultar los juegos jugados desde
 
 | Function | Ruta / Trigger | Respuesta | Descripción |
 |---|---|---|---|
-| `profileDataCommand` | `GET /api/profile-data` | `text/plain` | Comando `!steam`: juegos, horas, juegos al 100 %, más jugado, reciente (el de `rtime_last_played` más nuevo, igual que `!avance`) o jugando ahora, y link al perfil. Siempre responde status 200 con un mensaje apto para el chat, incluso si hay error. |
+| `profileDataCommand` | `GET /api/profile-data` | `text/plain` | Comando `!steam`: juegos, horas, juegos al 100 %, más jugado, reciente (el de `rtime_last_played` más nuevo, igual que `!progress`) o jugando ahora, y link al perfil. Siempre responde status 200 con un mensaje apto para el chat, incluso si hay error. |
 | `updateCompletionStats` | Programada, `*/30 * * * *` | — | Recalcula de forma incremental el progreso de logros por juego y lo guarda en Blobs. |
-| `gameProgressCommand` | `GET /api/game-progress?q=` | `text/plain` | Comando `!avance {juego}`: logros obtenidos de un juego, buscado por appid o por nombre (con similitud y "¿Quisiste decir…?"). Sin argumento usa el juego en partida o el último jugado. Siempre responde status 200. |
+| `gameProgressCommand` | `GET /api/game-progress?q=` | `text/plain` | Comando `!progress {juego}`: logros obtenidos de un juego, buscado por appid o por nombre (con similitud y "¿Quisiste decir…?"). Sin argumento usa el juego en partida o el último jugado. Siempre responde status 200. |
 
 ### Estructura
 
@@ -100,7 +100,7 @@ Crear un comando custom `!steam` con esta respuesta:
 ${customapi.https://TU-SITIO.netlify.app/api/profile-data}
 ```
 
-Y un comando `!avance`:
+Y un comando `!progress`:
 
 ```
 ${customapi.https://TU-SITIO.netlify.app/api/game-progress?q=${queryescape ${1:}}}
@@ -126,13 +126,13 @@ Límites del plan Free: 125k invocaciones al mes y 100 h de ejecución.
 - [x] `!steam`: juegos, horas totales, juegos al 100 %, más jugado, reciente o jugando ahora, y link al perfil
 - [x] Cálculo incremental de juegos al 100 % con Scheduled Function y Netlify Blobs
 - [x] Caché de la biblioteca y mensajes de error aptos para el chat
-- [x] `!avance {juego}`: progreso de logros de un juego (`Baldur's Gate 3: 38/54 logros (70%)`)
+- [x] `!progress {juego}`: progreso de logros de un juego (`Baldur's Gate 3: 38/54 logros (70%)`)
   - [x] Búsqueda por appid y por nombre, con normalización y similitud (Dice)
   - [x] "¿Quisiste decir…?" cuando hay varios candidatos
   - [x] Sin argumento: el juego actual o el último jugado
   - [x] Detectar juegos sin logros
 
-### 🚧 Pendiente de `!avance`
+### 🚧 Pendiente de `!progress`
 - [ ] Recortar la respuesta a menos de 400 caracteres
 - [ ] Alias manuales (`re4`, `bg3`)
 
